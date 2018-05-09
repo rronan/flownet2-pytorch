@@ -318,19 +318,28 @@ class ChairsSDHomTest(ChairsSDHom):
         super(ChairsSDHomTest, self).__init__(args, is_cropped = is_cropped, root = root, dstype = 'test', replicates = replicates)
 
 class ImagesFromFolder(data.Dataset):
-  def __init__(self, args, is_cropped, root = '/path/to/frames/only/folder', iext = 'png', replicates = 1):
+  def __init__(self, args, is_cropped, root = '/path/to/folder/of/frames/only/folders', iext = 'png', replicates = 1):
     self.args = args
     self.is_cropped = is_cropped
     self.crop_size = args.crop_size
     self.render_size = args.inference_size
     self.replicates = replicates
 
-    images = sorted( glob( join(root, '*.' + iext) ) )
     self.image_list = []
-    for i in range(len(images)-1):
-        im1 = images[i]
-        im2 = images[i+1]
-        self.image_list += [ [ im1, im2 ] ]
+    if self.args.intphys == '2d':
+        for f in [join(root, '%04d/frames' %i) for i in range(1,3001)]:
+            images = sorted( glob( join(f, '*.' + iext) ) )
+            for i in range(len(images)-1):
+                im1 = images[i]
+                im2 = images[i+1]
+                self.image_list += [ [ im1, im2 ] ]
+    else:
+        for f in [join(root, '%05d_block_O1_train/scene' %i) for i in range(15000,15001)]:
+            images = sorted( glob( join(f, '*.' + iext) ) )
+            for i in range(len(images)-1):
+                im1 = images[i]
+                im2 = images[i+1]
+                self.image_list += [ [ im1, im2 ] ]
 
     self.size = len(self.image_list)
 
@@ -350,12 +359,11 @@ class ImagesFromFolder(data.Dataset):
 
     images = [img1, img2]
     image_size = img1.shape[:2]
-    if self.is_cropped:
-        cropper = StaticRandomCrop(image_size, self.crop_size)
-    else:
-        cropper = StaticCenterCrop(image_size, self.render_size)
-    images = map(cropper, images)
-    
+    #if self.is_cropped:
+    #    cropper = StaticRandomCrop(image_size, self.crop_size)
+    #else:
+    #    cropper = StaticCenterCrop(image_size, self.render_size)
+    images = list(map(lambda x: imresize(x, (256, 256)), images))
     images = np.array(images).transpose(3,0,1,2)
     images = torch.from_numpy(images.astype(np.float32))
 

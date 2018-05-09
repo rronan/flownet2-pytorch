@@ -78,7 +78,7 @@ class FlowNetC(nn.Module):
 
         # FlownetC bottom input stream
         out_conv1b = self.conv1(x2)
-        
+
         out_conv2b = self.conv2(out_conv1b)
         out_conv3b = self.conv3(out_conv2b)
 
@@ -108,7 +108,8 @@ class FlowNetC(nn.Module):
         flow5       = self.predict_flow5(concat5)
         flow5_up    = self.upsampled_flow5_to_4(flow5)
         out_deconv4 = self.deconv4(concat5)
-        concat4 = torch.cat((out_conv4,out_deconv4,flow5_up),1)
+
+        concat4 = torch.cat((out_conv4,out_deconv4,flow5_up), 1)
 
         flow4       = self.predict_flow4(concat4)
         flow4_up    = self.upsampled_flow4_to_3(flow4)

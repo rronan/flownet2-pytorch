@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import numpy as np
 
 TAG_CHAR = np.array([202021.25], np.float32)
@@ -12,7 +17,7 @@ def readFlow(fn):
     with open(fn, 'rb') as f:
         magic = np.fromfile(f, np.float32, count=1)
         if 202021.25 != magic:
-            print 'Magic number incorrect. Invalid .flo file'
+            print('Magic number incorrect. Invalid .flo file')
             return None
         else:
             w = np.fromfile(f, np.int32, count=1)
@@ -25,7 +30,7 @@ def readFlow(fn):
 
 def writeFlow(filename,uv,v=None):
     """ Write optical flow to file.
-    
+
     If v is None, uv is assumed to contain both u and v channels,
     stacked in depth.
     Original code by Deqing Sun, adapted from Daniel Scharstein.
